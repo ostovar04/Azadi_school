@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f2ff">
+  <title>چالش جدول ضرب</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #28243f;
+      --muted: #77738d;
+      --purple: #7155d9;
+      --purple-dark: #563bc0;
+      --lavender: #eee9ff;
+      --green: #24845c;
+      --red: #c34d59;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 15% 15%, #e7ddff 0, transparent 32%),
+        radial-gradient(ellipse at 88% 83%, #dff5ee 0, transparent 30%),
+        #f8f7fc;
+      font-family: Tahoma, "Segoe UI", sans-serif;
+    }
+    .card {
+      width: min(100%, 510px);
+      overflow: hidden;
+      border: 1px solid #ffffff;
+      border-radius: 28px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 24px 70px rgba(63, 48, 120, .14);
+    }
+    .top { padding: 30px 32px 22px; text-align: center; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: 99px;
+      color: var(--purple-dark);
+      background: var(--lavender);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    h1 { margin: 15px 0 8px; font-size: clamp(25px, 6vw, 32px); }
+    .subtitle { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .content { padding: 0 32px 30px; }
+    .progress-row { display: flex; justify-content: space-between; margin: 3px 0 9px; color: var(--muted); font-size: 13px; }
+    .track { height: 8px; overflow: hidden; border-radius: 99px; background: #efedf5; }
+    .fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9d82f2, var(--purple)); transition: width .3s ease; }
+    .question-box {
+      margin: 25px 0 20px;
+      padding: 26px 18px;
+      border: 1px solid #f0edfa;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #fbfaff, #f7f4ff);
+      text-align: center;
+    }
+    .question-label { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+    .question { margin: 0; direction: ltr; font-size: clamp(40px, 12vw, 56px); font-weight: 800; letter-spacing: 2px; }
+    .answer-row { display: flex; gap: 10px; }
+    input {
+      min-width: 0;
+      flex: 1;
+      padding: 14px 16px;
+      border: 2px solid #e9e6f1;
+      border-radius: 14px;
+      outline: none;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+      font-size: 18px;
+      text-align: center;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus { border-color: #9a82ee; box-shadow: 0 0 0 4px #eee9ff; }
+    button {
+      padding: 13px 22px;
+      border: 0;
+      border-radius: 14px;
+      color: white;
+      background: var(--purple);
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    button:hover { background: var(--purple-dark); }
+    button:active { transform: scale(.97); }
+    .feedback { min-height: 30px; margin: 14px 0 4px; text-align: center; font-weight: 700; line-height: 1.8; }
+    .feedback.good { color: var(--green); }
+    .feedback.try { color: var(--red); }
+    .score {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin-top: 19px;
+      padding-top: 17px;
+      border-top: 1px solid #f0eef5;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .score strong { color: var(--ink); }
+    .footer { padding: 13px; color: #9995aa; background: #fbfaff; text-align: center; font-size: 12px; }
+    @media (max-width: 420px) {
+      body { padding: 14px; }
+      .top { padding: 25px 20px 18px; }
+      .content { padding: 0 20px 24px; }
+      .answer-row { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <header class="top">
+      <div class="badge"><span aria-hidden="true">✨</span> تمرین باحال ریاضی</div>
+      <h1>چالش جدول ضرب</h1>
+      <p class="subtitle">حاضری؟ جواب درست رو بنویس و بدرخش!</p>
+    </header>
+    <section class="content" aria-label="آزمون جدول ضرب">
+      <div class="progress-row"><span>پیشرفت آزمون</span><span id="progressText">۱ از ۱۰</span></div>
+      <div class="track" role="progressbar" aria-label="پیشرفت آزمون" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><div class="fill" id="progressFill"></div></div>
+      <div class="question-box">
+        <p class="question-label">حاصل این ضرب چنده؟</p>
+        <p class="question" id="question" aria-live="polite">۳ × ۷</p>
+      </div>
+      <form id="answerForm">
+        <div class="answer-row">
+          <input id="answer" type="text" inputmode="numeric" autocomplete="off" placeholder="جوابت رو اینجا بنویس" aria-label="پاسخ ضرب" required>
+          <button type="submit" id="submitButton">بررسی جواب</button>
+        </div>
+      </form>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <div class="score" aria-label="امتیاز آزمون">
+        <span>✅ درست: <strong id="correctCount">۰</strong></span>
+        <span>🔥 امتیاز: <strong id="scoreCount">۰</strong></span>
+      </div>
+    </section>
+    <footer class="footer">هر تمرین، یک قدم به قهرمانی نزدیک‌ترت می‌کنه!</footer>
+  </main>
+  <script>
+    (() => {
+      const toPersian = value => String(value).replace(/\d/g, digit => '۰۱۲۳۴۵۶۷۸۹'[digit]);
+      const toEnglish = value => value.replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)).replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit));
+      const encouragements = ['آفرین! عالی جواب دادی! 🌟', 'درست گفتی، تو واقعاً زرنگی! 🎉', 'چه خوب! همین‌طور ادامه بده! 💪', 'فوق‌العاده بود! 👏', 'تو داری می‌ترکونی! 🚀'];
+      const form = document.getElementById('answerForm');
+      const input = document.getElementById('answer');
+      const question = document.getElementById('question');
+      const feedback = document.getElementById('feedback');
+      const progressText = document.getElementById('progressText');
+      const progressFill = document.getElementById('progressFill');
+      const progressBar = document.querySelector('[role="progressbar"]');
+      let questions = [];
+      let current = 0;
+      let correct = 0;
+      let locked = false;
+
+      function newQuiz() {
+        questions = [];
+        for (let a = 2; a <= 10; a++) for (let b = 2; b <= 10; b++) questions.push({ a, b, result: a * b });
+        for (let i = questions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+        questions = questions.slice(0, 10);
+        current = 0;
+        correct = 0;
+        locked = false;
+        document.getElementById('correctCount').textContent = toPersian(0);
+        document.getElementById('scoreCount').textContent = toPersian(0);
+        document.getElementById('submitButton').textContent = 'بررسی جواب';
+        input.disabled = false;
+        input.required = true;
+        showQuestion();
+        input.focus();
+      }
+
+      function showQuestion() {
+        const item = questions[current];
+        question.textContent = `${toPersian(item.a)} × ${toPersian(item.b)}`;
+        progressText.textContent = `${toPersian(current + 1)} از ${toPersian(questions.length)}`;
+        progressFill.style.width = `${current / questions.length * 100}%`;
+        progressBar.setAttribute('aria-valuenow', current);
+        input.value = '';
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+      }
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (locked) { newQuiz(); return; }
+        const answer = Number(toEnglish(input.value.trim()));
+        if (input.value.trim() === '' || !Number.isFinite(answer)) {
+          feedback.textContent = 'یه جواب عددی بنویس تا بررسیش کنم 🙂';
+          feedback.className = 'feedback try';
+          input.focus();
+          return;
+        }
+        if (answer === questions[current].result) {
+          correct++;
+          document.getElementById('correctCount').textContent = toPersian(correct);
+          document.getElementById('scoreCount').textContent = toPersian(correct * 10);
+          feedback.textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
+          feedback.className = 'feedback good';
+          current++;
+          if (current === questions.length) {
+            progressText.textContent = 'آزمون تموم شد!';
+            progressFill.style.width = '100%';
+            progressBar.setAttribute('aria-valuenow', questions.length);
+            question.textContent = '🎉';
+            feedback.textContent = correct === 10 ? 'بی‌نظیر بود! به همهٔ سؤال‌ها درست جواب دادی! 🏆' : `آزمون تموم شد! ${toPersian(correct)} جواب درست دادی؛ آفرین! 🌈`;
+            input.disabled = true;
+            input.required = false;
+            document.getElementById('submitButton').textContent = 'آزمون دوباره';
+            locked = true;
+            return;
+          }
+          window.setTimeout(showQuestion, 850);
+        } else {
+          feedback.textContent = 'اشکالی نداره! یه بار دیگه فکر کن و دوباره امتحان کن 💜';
+          feedback.className = 'feedback try';
+          input.select();
+        }
+      });
+
+      newQuiz();
+    })();
+  </script>
+</body>
+</html>
